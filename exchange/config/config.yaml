@@ -1,0 +1,39 @@
+env: "dev_mac" # dev_win, prod
+postgres_mac:
+  host: localhost
+  port: 5433
+  database: exchange
+  username: postgres
+  password: ted
+postgres_win:
+  host: localhost
+  port: 5432
+  database: exchange
+  username: postgres
+  password: postgres
+redis:
+  host: localhost
+  port: 6379
+  db: 0
+  password:
+binance_http_client:
+  base_url: https://api.binance.com
+  ticker_price_endpoint: /api/v3/ticker/price
+  streams:
+    - BTCUSDT
+    - ETHUSDT
+    - SOLUSDT
+    - BNBUSDT
+    - LTCUSDT
+    - XRPUSDT
+    - ADAUSDT
+    - DOGEUSDT
+    - DOTUSDT
+    - AVAXUSDT
+    - MATICUSDT
+    - LINKUSDT
+    - UNIUSDT
+    - ATOMUSDT
+    - XLMUSDT
+    - VETUSDT
+    - FILUSDT
