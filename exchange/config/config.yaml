@@ -1,4 +1,4 @@
-env: "dev_mac" # dev_win, prod
+env: "dev_win" # dev_win, prod
 postgres_mac:
   host: localhost
   port: 5433

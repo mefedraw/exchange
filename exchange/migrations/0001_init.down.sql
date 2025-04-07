@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS trading_pairs;
+DROP TABLE IF EXISTS users;
+
+DROP TYPE IF EXISTS order_status;
+DROP TYPE IF EXISTS order_type;

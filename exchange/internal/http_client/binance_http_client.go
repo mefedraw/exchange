@@ -34,7 +34,7 @@ func (pr *BinanceHTTPClient) GetPrice() ([]models.PriceResponse, error) {
 
 	reqUrl := fmt.Sprintf("%s%s%s", pr.baseURL, pr.endpoint, pr.addParamsToUrl())
 
-	log.Debug("making request to Binance API", "url", reqUrl)
+	// log.Debug("making request to Binance API", "url", reqUrl)
 	req, err := http.NewRequest(http.MethodGet, reqUrl, nil)
 	if err != nil {
 		log.Error("failed to create request", "error", err)

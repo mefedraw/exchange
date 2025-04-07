@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource name="0@localhost">
+  <database-model serializer="dbm" dbms="REDIS" family-id="REDIS" format-version="4.53">
+    <root id="1">
+      <ServerVersion>7.0.15</ServerVersion>
+    </root>
+    <schema id="2" parent="1" name="0">
+      <Current>1</Current>
+    </schema>
+    <schema id="3" parent="1" name="1"/>
+    <schema id="4" parent="1" name="10"/>
+    <schema id="5" parent="1" name="11"/>
+    <schema id="6" parent="1" name="12"/>
+    <schema id="7" parent="1" name="13"/>
+    <schema id="8" parent="1" name="14"/>
+    <schema id="9" parent="1" name="15"/>
+    <schema id="10" parent="1" name="2"/>
+    <schema id="11" parent="1" name="3"/>
+    <schema id="12" parent="1" name="4"/>
+    <schema id="13" parent="1" name="5"/>
+    <schema id="14" parent="1" name="6"/>
+    <schema id="15" parent="1" name="7"/>
+    <schema id="16" parent="1" name="8"/>
+    <schema id="17" parent="1" name="9"/>
+    <string id="18" parent="2" name="exchange:binance:price:ADAUSDT"/>
+    <string id="19" parent="2" name="exchange:binance:price:ATOMUSDT"/>
+    <string id="20" parent="2" name="exchange:binance:price:AVAXUSDT"/>
+    <string id="21" parent="2" name="exchange:binance:price:BNBUSDT"/>
+    <string id="22" parent="2" name="exchange:binance:price:BTCUSDT"/>
+    <string id="23" parent="2" name="exchange:binance:price:DOGEUSDT"/>
+    <string id="24" parent="2" name="exchange:binance:price:DOTUSDT"/>
+    <string id="25" parent="2" name="exchange:binance:price:ETHUSDT"/>
+    <string id="26" parent="2" name="exchange:binance:price:FILUSDT"/>
+    <string id="27" parent="2" name="exchange:binance:price:LINKUSDT"/>
+    <string id="28" parent="2" name="exchange:binance:price:LTCUSDT"/>
+    <string id="29" parent="2" name="exchange:binance:price:MATICUSDT"/>
+    <string id="30" parent="2" name="exchange:binance:price:SOLUSDT"/>
+    <string id="31" parent="2" name="exchange:binance:price:UNIUSDT"/>
+    <string id="32" parent="2" name="exchange:binance:price:VETUSDT"/>
+    <string id="33" parent="2" name="exchange:binance:price:XLMUSDT"/>
+    <string id="34" parent="2" name="exchange:binance:price:XRPUSDT"/>
+  </database-model>
+</dataSource>

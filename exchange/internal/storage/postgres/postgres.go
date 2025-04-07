@@ -52,7 +52,7 @@ func (s *Storage) CreateUser(ctx context.Context,
 	const op = "postgresql.CreateUser"
 	log := slog.With("op", op)
 
-	const queryCreateUser = "INSERT INTO users(email, pass_hash,balance, created_at) VALUES ($1, $2, $3, $4) RETURNING id)"
+	const queryCreateUser = "INSERT INTO users(email, pass_hash,balance, created) VALUES ($1, $2, $3, $4) RETURNING id"
 	var userId int64
 	err := s.db.QueryRow(ctx, queryCreateUser, email, passHash, balance, createdAt).Scan(&userId)
 	if err != nil {
@@ -161,7 +161,7 @@ func (s *Storage) CreateOrder(ctx context.Context,
 	const op = "postgresql.CreateOrder"
 	log := slog.With("op", op)
 
-	const queryCreateOrder = "INSERT INTO orders(id, user_id, pair_id, order_type, margin, leverage, entry_price, order_status, created_at RETURNING id)"
+	const queryCreateOrder = "INSERT INTO orders(id, user_id, pair_id, type, margin, leverage, entry_price, status, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id"
 
 	var orderId uuid.UUID
 	err := s.db.QueryRow(ctx, queryCreateOrder, id, userId, pairId, orderType, margin, leverage, entryPrice, status, createdAt).Scan(&orderId)
@@ -243,8 +243,8 @@ func (s *Storage) OpenOrder(
 
 	// 1. Создаем ордер
 	const queryCreateOrder = `
-        INSERT INTO orders(id, user_id, pair_id, order_type, margin, leverage, 
-                          entry_price, order_status, created_at)
+        INSERT INTO orders(id, user_id, pair_id, type, margin, leverage, 
+                          entry_price, status, created_at)
         VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING id`
 
@@ -313,7 +313,7 @@ func (s *Storage) CloseOrder(
 		status models.OrderStatus
 	)
 	err = tx.QueryRow(ctx, `
-        SELECT user_id, order_status 
+        SELECT user_id, status 
         FROM orders 
         WHERE id = $1 
         FOR UPDATE`, // Блокировка ордера
@@ -339,9 +339,8 @@ func (s *Storage) CloseOrder(
 	_, err = tx.Exec(ctx, `
         UPDATE orders 
         SET 
-            order_status = $1,
-            close_price = $2,
-            closed_at = NOW()
+            status = $1,
+            close_price = $2
         WHERE id = $3`,
 		models.Closed,
 		closePrice,

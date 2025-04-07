@@ -40,7 +40,7 @@ type BalanceManager interface {
 	DecreaseBalance(ctx context.Context, id int64, decreaseAmount decimal.Decimal) (decimal.Decimal, error)
 }
 
-func NewUser(log slog.Logger, manager Manager, balanceManager BalanceManager) *UserService {
+func New(log slog.Logger, manager Manager, balanceManager BalanceManager) *UserService {
 	return &UserService{
 		log:            log,
 		manager:        manager,
