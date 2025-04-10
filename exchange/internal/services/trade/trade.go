@@ -113,6 +113,12 @@ func (t *Trade) CloseTradeDeal(ctx context.Context, orderId uuid.UUID, ticker st
 func calculateOrderProfit(order models.Order, closePriceDec decimal.Decimal) decimal.Decimal {
 	priceDiff := closePriceDec.Sub(order.EntryPrice)
 	priceChange := priceDiff.Div(order.EntryPrice)
+
+	// if order is short -> use reverse logic
+	if order.Type == models.Short {
+		priceChange = priceChange.Mul(decimal.NewFromInt(-1))
+	}
+
 	profit := priceChange.Mul(decimal.NewFromInt(int64(order.Leverage))).Mul(order.Margin)
 
 	return profit
