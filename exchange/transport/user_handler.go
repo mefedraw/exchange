@@ -47,7 +47,7 @@ func (h *UserHandler) Routes() chi.Router {
 		router.Post("/register", h.PostRegister)
 
 		router.Group(func(routerWithAuth chi.Router) {
-			// routerWithAuth.Use(h.authMiddleware) // Предполагается, что у вас есть middleware для аутентификации
+			// routerWithAuth.Use(h.authMiddleware) // middleware для аутентификации
 
 			routerWithAuth.Get("/balance", h.GetBalance)
 			routerWithAuth.Post("/balance/increase", h.PostIncreaseBalance)

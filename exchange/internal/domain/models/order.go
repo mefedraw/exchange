@@ -23,15 +23,14 @@ const (
 )
 
 type Order struct {
-	Id               uuid.UUID
-	UserId           int64
-	PairId           int64
-	Type             OrderType
-	Margin           decimal.Decimal
-	Leverage         uint8
-	EntryPrice       decimal.Decimal
-	ClosePrice       *decimal.Decimal
-	LiquidationPrice decimal.Decimal
-	Status           OrderStatus
-	CreatedAt        time.Time
+	Id         uuid.UUID
+	UserId     int64
+	PairId     int64
+	Type       OrderType
+	Margin     decimal.Decimal
+	Leverage   uint8
+	EntryPrice decimal.Decimal
+	ClosePrice *decimal.Decimal
+	Status     OrderStatus
+	CreatedAt  time.Time
 }

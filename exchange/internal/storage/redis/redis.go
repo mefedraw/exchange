@@ -9,6 +9,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"log/slog"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -71,9 +72,20 @@ func (s *Redis) GetAllPrices(ctx context.Context) ([]models.PriceResponse, error
 
 func (s *Redis) GetPrice(ctx context.Context, ticker string) (string, error) {
 	log := slog.With("method", "GetPrice")
-	data, err := s.client.Get(ctx, prefix+":"+ticker).Result()
+
+	tickerRedis := ticker
+	if strings.Contains(ticker, "/") {
+		parts := strings.Split(ticker, "/")
+		if len(parts) != 2 {
+			return "", fmt.Errorf("invalid ticker: %s", ticker)
+		}
+		tickerRedis = parts[0] + parts[1]
+		log.Debug("ticker modified", "ticker", ticker)
+	}
+
+	data, err := s.client.Get(ctx, prefix+":"+tickerRedis).Result()
 	if err != nil {
-		log.Error("failed to get prices", "err", err)
+		log.Error("failed to get price", "err", err)
 		return "", fmt.Errorf("failed to get prices: %w", err)
 	}
 	var price string
@@ -83,5 +95,6 @@ func (s *Redis) GetPrice(ctx context.Context, ticker string) (string, error) {
 		return "", fmt.Errorf("failed to unmarshal prices: %w", err)
 	}
 
+	log.Info("successfully get price from redis", "price", price)
 	return price, nil
 }

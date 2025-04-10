@@ -3,6 +3,7 @@ package postgres
 import (
 	"Exchange/internal/domain/models"
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
@@ -19,8 +20,9 @@ const (
 )
 
 var (
-	ErrUserAlreadyExists    = errors.New("User already exists")
-	ErrTradingPairNotExists = errors.New("Trading pair does not exist")
+	ErrUserAlreadyExists    = errors.New("user already exists")
+	ErrTradingPairNotExists = errors.New("trading pair does not exist")
+	ErrOrderNotExists       = errors.New("order does not exist")
 )
 
 type Storage struct {
@@ -103,7 +105,7 @@ func (s *Storage) GetUserById(ctx context.Context, id int64) (models.User, error
 	log := slog.With("op", op)
 	const queryGetUserById = `SELECT * FROM users WHERE id = $1`
 	var user models.User
-	err := s.db.QueryRow(ctx, queryGetUserById, id).Scan(&user)
+	err := s.db.QueryRow(ctx, queryGetUserById, id).Scan(&user.Id, &user.Email, &user.PassHash, &user.Balance, &user.Created)
 	if err != nil {
 		log.Error("Failed to get user", "id", id, "err", err)
 		return user, fmt.Errorf("%s: %w", op, err)
@@ -179,8 +181,11 @@ func (s *Storage) GetOrder(ctx context.Context, id uuid.UUID) (models.Order, err
 	log := slog.With("op", op)
 	const queryGetOrder = `SELECT * FROM orders WHERE id = $1`
 	var order models.Order
-	err := s.db.QueryRow(ctx, queryGetOrder, id).Scan(&order)
+	err := s.db.QueryRow(ctx, queryGetOrder, id).Scan(&order.Id, &order.UserId, &order.PairId, &order.Type, &order.Margin, &order.Leverage, &order.EntryPrice, &order.ClosePrice, &order.Status, &order.CreatedAt)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return order, fmt.Errorf("%s: %w", op, ErrOrderNotExists)
+		}
 		log.Error("Failed to get order", "id", id, "err", err)
 		return order, fmt.Errorf("%s: %w", op, err)
 	}

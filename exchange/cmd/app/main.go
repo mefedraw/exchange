@@ -4,6 +4,7 @@ import (
 	"Exchange/internal/config"
 	"Exchange/internal/http_client"
 	"Exchange/internal/services/order"
+	"Exchange/internal/services/trade"
 	user "Exchange/internal/services/user"
 	"Exchange/internal/storage/postgres"
 	"Exchange/internal/storage/redis"
@@ -71,14 +72,18 @@ func main() {
 	}()
 
 	validate := validator.New()
+
 	userService := user.New(*log, storage, storage)
-	_ = order.New(*log, storage, storage, storage)
+	orderService := order.New(*log, storage, storage, storage)
+	tradeService := trade.New(log, *orderService, *redisClient)
 
 	userHandler := handler.NewUserHandler(log, userService, validate)
+	tradeHandler := handler.NewTradeHandler(log, tradeService, validate)
 
 	// Настройка маршрутов
 	r := chi.NewRouter()
-	r.Mount("/", userHandler.Routes())
+	r.Mount("/user", userHandler.Routes())
+	r.Mount("/trade", tradeHandler.Routes())
 
 	// Запуск сервера
 	port := ":8080"

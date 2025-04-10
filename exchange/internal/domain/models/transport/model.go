@@ -1,6 +1,10 @@
 ﻿package transport
 
-import "github.com/shopspring/decimal"
+import (
+	"Exchange/internal/domain/models"
+	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
+)
 
 type ErrorResponse struct {
 	Error string `json:"error"`
@@ -35,4 +39,25 @@ type DecreaseBalanceRequest struct {
 type BalanceResponse struct {
 	UserID  int64           `json:"id"`
 	Balance decimal.Decimal `json:"balance"`
+}
+
+type OpenTradeRequest struct {
+	UserID    int64            `json:"user_id" validate:"required"`
+	Ticker    string           `json:"ticker" validate:"required"`
+	OrderType models.OrderType `json:"order_type" validate:"required"`
+	Margin    decimal.Decimal  `json:"margin" validate:"required"`
+	Leverage  uint8            `json:"leverage" validate:"required"`
+}
+
+type OpenTradeResponse struct {
+	OrderID uuid.UUID `json:"order_id"`
+}
+
+type CloseTradeRequest struct {
+	OrderID uuid.UUID `json:"order_id" validate:"required"`
+	Ticker  string    `json:"ticker" validate:"required"`
+}
+
+type CloseTradeResponse struct {
+	OrderID uuid.UUID `json:"order_id"`
 }

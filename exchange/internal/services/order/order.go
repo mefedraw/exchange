@@ -71,6 +71,7 @@ func New(log slog.Logger, manager Manager, tp TradingPairManager, userManager us
 	}
 }
 
+// CreateOrder checks ticker, user
 func (o *Order) CreateOrder(ctx context.Context,
 	userId int64,
 	ticker string,
@@ -184,8 +185,19 @@ func (o *Order) CloseOrder(ctx context.Context,
 	return orderId, nil
 }
 
+func (o *Order) GetOrder(ctx context.Context, orderID uuid.UUID) (models.Order, error) {
+	const op = "order.GetOrder"
+	order, err := o.manager.GetOrder(ctx, orderID)
+	if err != nil {
+		o.log.Error("failed to get order", "order", orderID, "error", err)
+		return models.Order{}, fmt.Errorf("%s: %w", op, err)
+	}
+	return order, nil
+}
+
 func checkTicker(ticker string) (string, string, error) {
 	const op = "order.CheckTicker"
+	slog.Info("Checking ticker", "ticker", ticker)
 	parts := strings.Split(ticker, "/")
 	if len(parts) != 2 {
 		return "", "", fmt.Errorf("%s: %w", op, ErrInvalidTicker)

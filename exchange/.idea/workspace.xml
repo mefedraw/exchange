@@ -10,17 +10,8 @@
       <change beforePath="$PROJECT_DIR$/../.mockery.yaml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../Makefile" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/http_client/binance_http_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/http_client/binance_http_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/services/user/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/services/user/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/storage/postgres/postgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/storage/postgres/postgres.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/0001_init.down.sql" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/0001_init.down.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/0001_init.up.sql" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/0001_init.up.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../go.mod" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../grpcAuth/.github/workflows/go.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../grpcAuth/.github/workflows/go.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../grpcAuth/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../grpcAuth/.idea/vcs.xml" afterDir="false" />
@@ -61,6 +52,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "mefedraw"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/mefedraw/exchange.git",
+    "accountId": "d1132fb5-9ca7-4e9b-ada0-778196263df7"
+  }
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 5
