@@ -20,7 +20,7 @@ var (
 
 type Order struct {
 	log     slog.Logger
-	manager Manager
+	Manager Manager
 	tp      TradingPairManager
 	um      user.Manager
 }
@@ -65,7 +65,7 @@ type TradingPairManager interface {
 func New(log slog.Logger, manager Manager, tp TradingPairManager, userManager user.Manager) *Order {
 	return &Order{
 		log:     log,
-		manager: manager,
+		Manager: manager,
 		tp:      tp,
 		um:      userManager,
 	}
@@ -103,7 +103,7 @@ func (o *Order) CreateOrder(ctx context.Context,
 	orderStatus := models.Open
 	createdAt := time.Now()
 
-	orderId, err = o.manager.CreateOrder(ctx, orderId, userId, pairId, orderType, margin, leverage, entryPrice, orderStatus, createdAt)
+	orderId, err = o.Manager.CreateOrder(ctx, orderId, userId, pairId, orderType, margin, leverage, entryPrice, orderStatus, createdAt)
 	if err != nil {
 		o.log.Error("failed to create order", "error", err)
 		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
@@ -149,7 +149,7 @@ func (o *Order) OpenOrder(ctx context.Context,
 	orderStatus := models.Open
 	createdAt := time.Now()
 
-	orderId, err = o.manager.OpenOrder(ctx, orderId, userId, pairId, orderType, margin, leverage, entryPrice, orderStatus, createdAt)
+	orderId, err = o.Manager.OpenOrder(ctx, orderId, userId, pairId, orderType, margin, leverage, entryPrice, orderStatus, createdAt)
 	if err != nil {
 		o.log.Error("failed to create order", "error", err)
 		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
@@ -165,7 +165,7 @@ func (o *Order) CloseOrder(ctx context.Context,
 	const op = "order.CloseOrder"
 
 	// check if order exists
-	_, err := o.manager.GetOrder(ctx, orderID)
+	_, err := o.Manager.GetOrder(ctx, orderID)
 	if err != nil {
 		o.log.Error("failed to get order", "order", orderID, "error", err)
 		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
@@ -176,7 +176,7 @@ func (o *Order) CloseOrder(ctx context.Context,
 	// 1) liquidation calls CloseOrder() and sets order status
 	// 2) liquidation calls its own method
 
-	orderId, err := o.manager.CloseOrder(ctx, orderID, closePrice, balanceIncrease)
+	orderId, err := o.Manager.CloseOrder(ctx, orderID, closePrice, balanceIncrease)
 	if err != nil {
 		o.log.Error("failed to close order", "error", err)
 		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
@@ -187,7 +187,7 @@ func (o *Order) CloseOrder(ctx context.Context,
 
 func (o *Order) GetOrder(ctx context.Context, orderID uuid.UUID) (models.Order, error) {
 	const op = "order.GetOrder"
-	order, err := o.manager.GetOrder(ctx, orderID)
+	order, err := o.Manager.GetOrder(ctx, orderID)
 	if err != nil {
 		o.log.Error("failed to get order", "order", orderID, "error", err)
 		return models.Order{}, fmt.Errorf("%s: %w", op, err)

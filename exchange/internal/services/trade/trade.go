@@ -26,6 +26,19 @@ type Trade struct {
 	redis        redis.Redis
 }
 
+func (t *Trade) GetUserOrders(ctx context.Context, id int64) ([]models.Order, error) {
+	const op = "order.GetAllUserOrders"
+	// t.log.With("op", op)
+	orders, err := t.orderService.Manager.GetUserOrders(ctx, id)
+	if err != nil {
+		t.log.Error("failed to get all user order", "id", id, "error", err)
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	t.log.Debug("got all user orders", "id", id)
+	return orders, nil
+}
+
 func New(log *slog.Logger, orderService order.Order, redis redis.Redis) *Trade {
 	return &Trade{
 		log:          *log,

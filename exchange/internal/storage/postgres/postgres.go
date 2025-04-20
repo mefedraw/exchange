@@ -90,7 +90,7 @@ func (s *Storage) GetUserByEmail(ctx context.Context, email string) (models.User
 	log := slog.With("op", op)
 	const queryGetUserByEmail = `SELECT * FROM users WHERE email = $1`
 	var user models.User
-	err := s.db.QueryRow(ctx, queryGetUserByEmail, email).Scan(&user)
+	err := s.db.QueryRow(ctx, queryGetUserByEmail, email).Scan(&user.Id, &user.Email, &user.PassHash, &user.Balance, &user.Created)
 	if err != nil {
 		log.Error("Failed to get user", "email", email, "err", err)
 		return user, fmt.Errorf("%s: %w", op, err)
@@ -207,7 +207,11 @@ func (s *Storage) GetUserOrders(ctx context.Context, userId int64) ([]models.Ord
 	defer rows.Close()
 	for rows.Next() {
 		var order models.Order
-		err := rows.Scan(&order)
+		err := rows.Scan(&order.Id, &order.UserId,
+			&order.PairId, &order.Type,
+			&order.Margin, &order.Leverage,
+			&order.EntryPrice, &order.ClosePrice,
+			&order.Status, &order.CreatedAt)
 		if err != nil {
 			log.Error("Failed to scan user order", "user_id", userId, "err", err)
 			return orders, fmt.Errorf("%s: %w", op, err)

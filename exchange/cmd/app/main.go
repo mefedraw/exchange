@@ -41,11 +41,11 @@ func main() {
 
 	// postgres://postgres:postgres@localhost:5432/exchange?sslmode=disable
 	connString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		cfg.PostgresCfgWin.Username,
-		cfg.PostgresCfgWin.Password,
-		cfg.PostgresCfgWin.Host,
-		cfg.PostgresCfgWin.Port,
-		cfg.PostgresCfgWin.Database)
+		cfg.PostgresCfgMac.Username,
+		cfg.PostgresCfgMac.Password,
+		cfg.PostgresCfgMac.Host,
+		cfg.PostgresCfgMac.Port,
+		cfg.PostgresCfgMac.Database)
 
 	storage, err := postgres.New(connString)
 	if err != nil {
@@ -80,12 +80,26 @@ func main() {
 	userHandler := handler.NewUserHandler(log, userService, validate)
 	tradeHandler := handler.NewTradeHandler(log, tradeService, validate)
 
-	// Настройка маршрутов
 	r := chi.NewRouter()
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+			w.Header().Set("Access-Control-Max-Age", "300")
+
+			if r.Method == http.MethodOptions {
+				w.WriteHeader(http.StatusNoContent)
+				return
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	})
 	r.Mount("/user", userHandler.Routes())
 	r.Mount("/trade", tradeHandler.Routes())
 
-	// Запуск сервера
 	port := ":8080"
 	log.Info("Starting server on " + port)
 	if err := http.ListenAndServe(port, r); err != nil {

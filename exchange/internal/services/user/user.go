@@ -13,15 +13,21 @@ import (
 )
 
 var (
-	ErrUserAlreadyExists = errors.New("User already exists")
-	ErrInsufficientFunds = errors.New("Insufficient funds")
-	ErrInvalidAmount     = errors.New("Invalid amount")
+	ErrUserAlreadyExists  = errors.New("User already exists")
+	ErrInsufficientFunds  = errors.New("Insufficient funds")
+	ErrInvalidAmount      = errors.New("Invalid amount")
+	ErrInvalidCredentials = errors.New("Invalid credentials")
 )
 
 type UserService struct {
 	log            slog.Logger
 	manager        Manager
 	balanceManager BalanceManager
+}
+
+func (us *UserService) GetUserOrders(ctx context.Context, id int64) ([]models.Order, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 type Manager interface {
@@ -69,6 +75,67 @@ func (us *UserService) RegisterNewUser(ctx context.Context, email string, passwo
 
 	return id, nil
 }
+
+func (us *UserService) Login(ctx context.Context, email, password string) (int64, error) {
+	const op = "user.Login"
+
+	user, err := us.manager.GetUserByEmail(ctx, email)
+	if err != nil {
+		slog.Error("Failed to get user by email", "email", email, "err", err, "op", op)
+		return 0, fmt.Errorf("%s: %w", op, err)
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PassHash), []byte(password)); err != nil {
+		slog.Error("invalid credentials", slog.String("error", err.Error()))
+
+		return 0, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
+	return user.Id, nil
+}
+
+/*
+func (a *Auth) Login(
+	ctx context.Context,
+	email, password string,
+	appID int) (string, error) {
+	const op = "auth.Login"
+
+	log := a.log.With(slog.String("op", op),
+		slog.String("email", email))
+
+	user, err := a.userProvider.User(ctx, email)
+	if err != nil {
+		if errors.Is(err, storage.ErrUserNotFound) {
+			log.Warn("user not found", slog.String("error", err.Error()))
+
+			return "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+		}
+
+		log.Error("failed to get user", slog.String("error", err.Error()))
+	}
+
+	if err := bcrypt.CompareHashAndPassword(user.PassHash, []byte(password)); err != nil {
+		log.Error("invalid credentials", slog.String("error", err.Error()))
+
+		return "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
+	app, err := a.appProvider.App(ctx, int64(appID))
+	if err != nil {
+		log.Error("failed to get app", slog.String("error", err.Error()))
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	token, err := jwt.NewToken(user, app, a.tokenTTL)
+	if err != nil {
+		log.Error("failed to create token", slog.String("error", err.Error()))
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	return token, nil
+}
+*/
 
 func (us *UserService) GetBalance(ctx context.Context, id int64) (decimal.Decimal, error) {
 	const op = "user.GetBalance"

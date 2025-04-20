@@ -31,6 +31,7 @@ type tradeService interface {
 		margin decimal.Decimal,
 		leverage uint8) (uuid.UUID, error)
 	CloseTradeDeal(ctx context.Context, orderId uuid.UUID, ticker string) (uuid.UUID, error)
+	GetUserOrders(ctx context.Context, id int64) ([]models.Order, error)
 }
 
 func NewTradeHandler(log *slog.Logger, tradeService tradeService, validate *validator.Validate) *TradeHandler {
@@ -41,7 +42,7 @@ func NewTradeHandler(log *slog.Logger, tradeService tradeService, validate *vali
 	}
 }
 
-func (h *TradeHandler) Routes() chi.Router {
+func (t *TradeHandler) Routes() chi.Router {
 	router := chi.NewRouter()
 	router.Use(middleware.Recoverer)
 
@@ -49,8 +50,9 @@ func (h *TradeHandler) Routes() chi.Router {
 		router.Group(func(routerWithAuth chi.Router) {
 			// routerWithAuth.Use(h.authMiddleware)
 
-			routerWithAuth.Post("/open", h.PostOpenTrade)
-			routerWithAuth.Post("/close", h.PostCloseTrade)
+			routerWithAuth.Post("/open", t.PostOpenTrade)
+			routerWithAuth.Post("/close", t.PostCloseTrade)
+			routerWithAuth.Get("/orders", t.GetUserOrders)
 		})
 	})
 
@@ -153,5 +155,48 @@ func (h *TradeHandler) PostCloseTrade(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(transport.CloseTradeResponse{
 		OrderID: orderID,
+	})
+}
+
+func (t *TradeHandler) GetUserOrders(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// 1. Парсим запрос
+	var req transport.GetOrdersRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		t.log.Error("Error decoding orders request:", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(transport.ErrorResponse{
+			Error: "Failed to decode request body",
+		})
+		return
+	}
+
+	// 2. Валидируем запрос
+	if err := t.validate.Struct(&req); err != nil {
+		t.log.Error("Error validating balance request:", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(transport.ErrorResponse{
+			Error: "Invalid request format",
+		})
+		return
+	}
+
+	// 3. Получаем баланс
+	orders, err := t.tradeService.GetUserOrders(r.Context(), req.Id)
+	if err != nil {
+		t.log.Error("Error getting balance:", "error", err, "userId", req.Id)
+
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(transport.ErrorResponse{
+			Error: "Failed to get orders",
+		})
+		return
+	}
+
+	// 4. Формируем ответ
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(transport.GetOrdersResponse{
+		Orders: orders,
 	})
 }

@@ -1,6 +1,7 @@
 ﻿package handler
 
 import (
+	"Exchange/internal/domain/models"
 	"Exchange/internal/domain/models/transport"
 	"Exchange/internal/services/order"
 	"Exchange/internal/services/user"
@@ -27,6 +28,8 @@ type userService interface {
 	GetBalance(ctx context.Context, id int64) (decimal.Decimal, error)
 	IncreaseBalance(ctx context.Context, id int64, increaseAmount decimal.Decimal) (decimal.Decimal, error)
 	DecreaseBalance(ctx context.Context, id int64, decreaseAmount decimal.Decimal) (decimal.Decimal, error)
+	GetUserOrders(ctx context.Context, id int64) ([]models.Order, error)
+	Login(ctx context.Context, email, password string) (int64, error)
 }
 
 func NewUserHandler(log *slog.Logger, userService userService, validate *validator.Validate) *UserHandler {
@@ -45,6 +48,7 @@ func (h *UserHandler) Routes() chi.Router {
 
 	router.Route("/api/user", func(router chi.Router) {
 		router.Post("/register", h.PostRegister)
+		router.Post("/login", h.PostLogin)
 
 		router.Group(func(routerWithAuth chi.Router) {
 			// routerWithAuth.Use(h.authMiddleware) // middleware для аутентификации
@@ -101,6 +105,55 @@ func (h *UserHandler) PostRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(struct {
+		ID int64 `json:"id"`
+	}{
+		ID: userID,
+	})
+}
+
+func (h *UserHandler) PostLogin(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var loginReq transport.LoginRequest
+	if err := json.NewDecoder(r.Body).Decode(&loginReq); err != nil {
+		h.log.Error("Error decoding login request:", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(transport.ErrorResponse{
+			Error: "Failed to decode request body",
+		})
+		return
+	}
+
+	if err := h.validate.Struct(&loginReq); err != nil {
+		h.log.Error("Error validating login request:", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(transport.ErrorResponse{
+			Error: "Invalid email or password format",
+		})
+		return
+	}
+
+	userID, err := h.userService.Login(r.Context(), loginReq.Email, loginReq.Password)
+	if err != nil {
+		h.log.Error("Error logging in user:", err)
+
+		if errors.Is(err, user.ErrInvalidCredentials) {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(transport.ErrorResponse{
+				Error: "Invalid email or password",
+			})
+			return
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(transport.ErrorResponse{
+			Error: "Failed to login user",
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(struct {
 		ID int64 `json:"id"`
 	}{
