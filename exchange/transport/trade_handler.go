@@ -52,7 +52,7 @@ func (t *TradeHandler) Routes() chi.Router {
 
 			routerWithAuth.Post("/open", t.PostOpenTrade)
 			routerWithAuth.Post("/close", t.PostCloseTrade)
-			routerWithAuth.Get("/orders", t.GetUserOrders)
+			routerWithAuth.Post("/orders", t.GetUserOrders)
 		})
 	})
 

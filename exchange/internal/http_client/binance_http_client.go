@@ -61,7 +61,7 @@ func (pr *BinanceHTTPClient) GetPrice() ([]models.PriceResponse, error) {
 		return nil, fmt.Errorf("decode response: %w", err)
 	}
 
-	log.Debug("successfully received price")
+	// log.Debug("successfully received price")
 
 	return priceResp, nil
 }

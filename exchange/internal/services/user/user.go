@@ -76,22 +76,22 @@ func (us *UserService) RegisterNewUser(ctx context.Context, email string, passwo
 	return id, nil
 }
 
-func (us *UserService) Login(ctx context.Context, email, password string) (int64, error) {
+func (us *UserService) Login(ctx context.Context, email, password string) (int64, string, error) {
 	const op = "user.Login"
 
 	user, err := us.manager.GetUserByEmail(ctx, email)
 	if err != nil {
 		slog.Error("Failed to get user by email", "email", email, "err", err, "op", op)
-		return 0, fmt.Errorf("%s: %w", op, err)
+		return 0, "", fmt.Errorf("%s: %w", op, err)
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PassHash), []byte(password)); err != nil {
 		slog.Error("invalid credentials", slog.String("error", err.Error()))
 
-		return 0, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+		return 0, "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
 	}
 
-	return user.Id, nil
+	return user.Id, user.Email, nil
 }
 
 /*

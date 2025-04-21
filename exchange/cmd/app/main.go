@@ -39,13 +39,25 @@ func main() {
 		slog.Any("cfg", cfg),
 	)
 
-	// postgres://postgres:postgres@localhost:5432/exchange?sslmode=disable
-	connString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		cfg.PostgresCfgMac.Username,
-		cfg.PostgresCfgMac.Password,
-		cfg.PostgresCfgMac.Host,
-		cfg.PostgresCfgMac.Port,
-		cfg.PostgresCfgMac.Database)
+	// TODO: переделать по уму коннект к бд
+	var connString string
+	if cfg.Env == envDevMac {
+		log.Info("connecting to postgres via dev_mac")
+		connString = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+			cfg.PostgresCfgMac.Username,
+			cfg.PostgresCfgMac.Password,
+			cfg.PostgresCfgMac.Host,
+			cfg.PostgresCfgMac.Port,
+			cfg.PostgresCfgMac.Database)
+	} else if cfg.Env == envDevWin {
+		log.Info("connecting to postgres via dev_win")
+		connString = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+			cfg.PostgresCfgWin.Username,
+			cfg.PostgresCfgWin.Password,
+			cfg.PostgresCfgWin.Host,
+			cfg.PostgresCfgWin.Port,
+			cfg.PostgresCfgWin.Database)
+	}
 
 	storage, err := postgres.New(connString)
 	if err != nil {

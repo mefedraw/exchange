@@ -5,34 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1bfe1390-3572-4cbf-8137-df1b2f9e8479" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.golangci.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.mockery.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Makefile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../go.mod" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../grpcAuth/.github/workflows/go.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../grpcAuth/.github/workflows/go.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../grpcAuth/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../grpcAuth/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../grpcAuth/cmd/sso/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/../grpcAuth/cmd/sso/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../grpcAuth/config/local.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../grpcAuth/config/local.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../grpcAuth/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/../grpcAuth/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../grpcAuth/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/../grpcAuth/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../grpcAuth/internal/app/app.go" beforeDir="false" afterPath="$PROJECT_DIR$/../grpcAuth/internal/app/app.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../grpcAuth/internal/app/grpc/app.go" beforeDir="false" afterPath="$PROJECT_DIR$/../grpcAuth/internal/app/grpc/app.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../grpcAuth/internal/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/../grpcAuth/internal/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../grpcAuth/internal/domain/models/app.go" beforeDir="false" afterPath="$PROJECT_DIR$/../grpcAuth/internal/domain/models/app.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../grpcAuth/internal/domain/models/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/../grpcAuth/internal/domain/models/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../grpcAuth/internal/grpc/auth/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/../grpcAuth/internal/grpc/auth/server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../grpcAuth/internal/services/auth/auth.go" beforeDir="false" afterPath="$PROJECT_DIR$/../grpcAuth/internal/services/auth/auth.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../grpcAuth/internal/storage/storage.go" beforeDir="false" afterPath="$PROJECT_DIR$/../grpcAuth/internal/storage/storage.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../scheduler/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../scheduler/.idea/dataSources.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../scheduler/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../scheduler/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../scheduler/cmd/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/../scheduler/cmd/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../scheduler/config/local.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../scheduler/config/local.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../scheduler/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/../scheduler/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../scheduler/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/../scheduler/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../scheduler/internal/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/../scheduler/internal/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../scheduler/internal/storage/storage.go" beforeDir="false" afterPath="$PROJECT_DIR$/../scheduler/internal/storage/storage.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/app/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/domain/models/transport/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/domain/models/transport/model.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/http_client/binance_http_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/http_client/binance_http_client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/services/user/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/services/user/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/storage/redis/redis.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/storage/redis/redis.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/transport/trade_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/transport/trade_handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/transport/user_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/transport/user_handler.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

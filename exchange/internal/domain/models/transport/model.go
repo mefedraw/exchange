@@ -86,5 +86,6 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Id int64 `json:"id"`
+	Id    int64  `json:"id"`
+	Email string `json:"email"`
 }

@@ -29,7 +29,7 @@ type userService interface {
 	IncreaseBalance(ctx context.Context, id int64, increaseAmount decimal.Decimal) (decimal.Decimal, error)
 	DecreaseBalance(ctx context.Context, id int64, decreaseAmount decimal.Decimal) (decimal.Decimal, error)
 	GetUserOrders(ctx context.Context, id int64) ([]models.Order, error)
-	Login(ctx context.Context, email, password string) (int64, error)
+	Login(ctx context.Context, email, password string) (int64, string, error)
 }
 
 func NewUserHandler(log *slog.Logger, userService userService, validate *validator.Validate) *UserHandler {
@@ -53,7 +53,7 @@ func (h *UserHandler) Routes() chi.Router {
 		router.Group(func(routerWithAuth chi.Router) {
 			// routerWithAuth.Use(h.authMiddleware) // middleware для аутентификации
 
-			routerWithAuth.Get("/balance", h.GetBalance)
+			routerWithAuth.Post("/balance", h.GetBalance)
 			routerWithAuth.Post("/balance/increase", h.PostIncreaseBalance)
 			routerWithAuth.Post("/balance/decrease", h.PostDecreaseBalance)
 		})
@@ -134,7 +134,7 @@ func (h *UserHandler) PostLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID, err := h.userService.Login(r.Context(), loginReq.Email, loginReq.Password)
+	userID, email, err := h.userService.Login(r.Context(), loginReq.Email, loginReq.Password)
 	if err != nil {
 		h.log.Error("Error logging in user:", err)
 
@@ -155,9 +155,11 @@ func (h *UserHandler) PostLogin(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(struct {
-		ID int64 `json:"id"`
+		ID    int64  `json:"id"`
+		Email string `json:"email"`
 	}{
-		ID: userID,
+		ID:    userID,
+		Email: email,
 	})
 }
 

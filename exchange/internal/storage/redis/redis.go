@@ -46,7 +46,7 @@ func (s *Redis) SavePrices(ctx context.Context, prices []models.PriceResponse) e
 		return fmt.Errorf("failed to save prices: %w", err)
 	}
 
-	log.Info("saved prices successfully")
+	// log.Info("saved prices successfully")
 	return nil
 
 }
