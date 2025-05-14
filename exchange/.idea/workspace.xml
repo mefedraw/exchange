@@ -5,17 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1bfe1390-3572-4cbf-8137-df1b2f9e8479" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/3cd6336a-915c-4ac4-8f66-db265089adb8.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/3cd6336a-915c-4ac4-8f66-db265089adb8.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/3cd6336a-915c-4ac4-8f66-db265089adb8/storage_v2/_src_/database/exchange.I46Zdg/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/3cd6336a-915c-4ac4-8f66-db265089adb8/storage_v2/_src_/database/exchange.I46Zdg/schema/public.abK9xQ.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/app/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/migrator/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/migrator/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/liquidator/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/order_consumer/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/domain/models/order.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/domain/models/order.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/services/order/order.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/services/order/order.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/services/trade/trade.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/services/trade/trade.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/storage/postgres/postgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/storage/postgres/postgres.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/storage/redis/redis.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/storage/redis/redis.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

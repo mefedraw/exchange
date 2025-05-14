@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"github.com/google/uuid"
 	"log/slog"
 	"strconv"
 	"strings"
@@ -82,7 +83,47 @@ func (s *Redis) SavePrices(ctx context.Context, prices []models.PriceResponse) e
 
 	// log.Info("saved prices successfully")
 	return nil
+}
 
+func (s *Redis) GetLiqOrders(ctx context.Context, ticker, price string) ([]uuid.UUID, error) {
+	const method = "GetLiqOrders"
+	log := slog.With("method", method)
+	parsedLiqPrice, err := strconv.ParseFloat(price, 64)
+	if err != nil {
+		log.Error("failed to parse liq price", "err", err)
+		return nil, fmt.Errorf("%s:%w", method, err)
+	}
+
+	const longPrefix = "orders:long:"
+	const shortPrefix = "orders:short:"
+	const minInf = "-inf"
+	const maxInf = "+inf"
+	maxScore := strconv.FormatFloat(parsedLiqPrice, 'f', -1, 64)
+	longOrders, err := s.client.ZRangeByScore(ctx, longPrefix+ticker, &redis.ZRangeBy{
+		Min: minInf, Max: maxScore,
+	}).Result()
+	if err != nil {
+		log.Error("failed to get long orders for liq by Zrange", "err", err)
+		return nil, fmt.Errorf("%s:%s:%w", method, "long", err)
+	}
+
+	minScore := maxScore
+	shortOrders, err := s.client.ZRangeByScore(ctx, shortPrefix+ticker, &redis.ZRangeBy{
+		Min: minScore, Max: maxInf,
+	}).Result()
+
+	allOrders := append(longOrders, shortOrders...)
+	result := make([]uuid.UUID, 0, len(allOrders))
+	for _, idStr := range allOrders {
+		id, err := uuid.Parse(idStr)
+		if err != nil {
+			log.Error("failed to parse UUID", "id", idStr, "err", err)
+			continue
+		}
+		result = append(result, id)
+	}
+
+	return result, nil
 }
 
 func (s *Redis) GetAllPrices(ctx context.Context) ([]models.PriceResponse, error) {
