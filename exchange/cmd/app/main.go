@@ -2,7 +2,9 @@ package main
 
 import (
 	"Exchange/internal/config"
+	"Exchange/internal/domain/models"
 	"Exchange/internal/http_client"
+	"Exchange/internal/liquidation"
 	"Exchange/internal/services/order"
 	"Exchange/internal/services/trade"
 	user "Exchange/internal/services/user"
@@ -13,6 +15,7 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
+	"github.com/nats-io/nats.go"
 	"log/slog"
 	"net/http"
 	"os"
@@ -67,27 +70,66 @@ func main() {
 	priceClient := http_client.New(*cfg, *log)
 	redisClient := redis.New(cfg.RedisCfg)
 
+	// TODO: init NATS CONN
+	nc, err := nats.Connect(nats.DefaultURL)
+	if err != nil {
+		log.Error("failed to connect to nats", "error", err)
+		panic(err)
+	}
+	log.Info("connected to nats broker", "url", nats.DefaultURL)
+	js, err := nc.JetStream()
+	if err != nil {
+		log.Error("failed to connect to nats", "error", err)
+		panic(err)
+	}
+	_, err = js.AddStream(&nats.StreamConfig{
+		Name:     "PRICES-STREAM",
+		Subjects: []string{"prices.*"},
+	})
+	if err != nil {
+		log.Error("failed to connect to nats", "error", err)
+		panic(err)
+	}
+
 	ctx := context.Background()
+	// todo: GET PRICES LOOP
 	go func() {
 		for {
 			prices, _ := priceClient.GetPrice()
 			_ = redisClient.SavePrices(ctx, prices)
-			/*
-				renewedPrices, _ := redisClient.GetAllPrices(context.Background())
-				for _, priceResp := range prices {
-					price, _ := redisClient.GetPrice(ctx, priceResp.Symbol)
-					fmt.Println(priceResp.Symbol, ":", price)
+			const topicPart = "prices."
+			for _, priceResp := range prices {
+				// todo: get it from cfg
+				topic := topicPart + priceResp.Symbol
+				_, err = js.Publish(topic, []byte(priceResp.Price))
+				if err != nil {
+					slog.Error("failed to publish price", "topic", topic, "priceResp", priceResp, "err", err)
 				}
-			*/
+			}
+			const testTicker = "TESTUSDT"
+			testPrice, _ := redisClient.GetPrice(ctx, testTicker)
+			testPriceResp := models.PriceResponse{
+				Symbol: testTicker,
+				Price:  testPrice,
+			}
+			_, err = js.Publish(topicPart+testTicker, []byte(testPriceResp.Price))
+			if err != nil {
+				slog.Error("failed to publish price", "topic", topicPart+testTicker, "priceResp", testPriceResp, "err", err)
+			}
 			time.Sleep(5 * time.Second)
 		}
 	}()
 
+	// TODO: init chi router
 	validate := validator.New()
 
 	userService := user.New(*log, storage, storage)
 	orderService := order.New(*log, storage, storage, storage)
 	tradeService := trade.New(log, *orderService, *redisClient)
+
+	// TODO: init Liquidator
+	liquidator, err := liquidation.NewLiquidator(nc, orderService)
+	liquidator.Process()
 
 	userHandler := handler.NewUserHandler(log, userService, validate)
 	tradeHandler := handler.NewTradeHandler(log, tradeService, validate)

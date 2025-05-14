@@ -5,15 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1bfe1390-3572-4cbf-8137-df1b2f9e8479" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/3cd6336a-915c-4ac4-8f66-db265089adb8.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/3cd6336a-915c-4ac4-8f66-db265089adb8.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/3cd6336a-915c-4ac4-8f66-db265089adb8/storage_v2/_src_/database/exchange.I46Zdg/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/3cd6336a-915c-4ac4-8f66-db265089adb8/storage_v2/_src_/database/exchange.I46Zdg/schema/public.abK9xQ.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/app/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/domain/models/transport/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/domain/models/transport/model.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/http_client/binance_http_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/http_client/binance_http_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/services/user/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/services/user/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/migrator/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/migrator/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/domain/models/order.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/domain/models/order.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/services/order/order.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/services/order/order.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/services/trade/trade.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/services/trade/trade.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/storage/postgres/postgres.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/storage/postgres/postgres.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/storage/redis/redis.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/storage/redis/redis.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transport/trade_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/transport/trade_handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transport/user_handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/transport/user_handler.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,6 +45,10 @@
     &quot;url&quot;: &quot;https://github.com/mefedraw/exchange.git&quot;,
     &quot;accountId&quot;: &quot;d1132fb5-9ca7-4e9b-ada0-778196263df7&quot;
   }
+}</component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
 }</component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -87,7 +94,19 @@
       <recent name="C:\Users\fyodo.DESKTOP-9A67S1J\GolandProjects\exchange" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build Exchange/cmd/app">
+  <component name="RunManager" selected="Go Build.go build Exchange/cmd/migrator">
+    <configuration name="go build Exchange/cmd/app" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="exchange" />
+      <working_directory value="$PROJECT_DIR$" />
+      <envs>
+        <env name="CONFIG_PATH" value="C:\Users\fyodo.DESKTOP-9A67S1J\GolandProjects\exchange\config\config.yaml" />
+      </envs>
+      <kind value="PACKAGE" />
+      <package value="Exchange/cmd/app" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/cmd/app/main.go" />
+      <method v="2" />
+    </configuration>
     <configuration name="go build Exchange/cmd/app" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="exchange" />
       <working_directory value="$PROJECT_DIR$" />
@@ -109,14 +128,23 @@
       <filePath value="$PROJECT_DIR$/cmd/migrator/main.go" />
       <method v="2" />
     </configuration>
+    <configuration name="go build Exchange/cmd/migrator" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="exchange" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="Exchange/cmd/migrator" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/cmd/migrator/main.go" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Go Build.go build Exchange/cmd/app" />
       <item itemvalue="Go Build.go build Exchange/cmd/migrator" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build Exchange/cmd/app" />
         <item itemvalue="Go Build.go build Exchange/cmd/migrator" />
+        <item itemvalue="Go Build.go build Exchange/cmd/app" />
       </list>
     </recent_temporary>
   </component>

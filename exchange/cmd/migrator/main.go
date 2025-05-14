@@ -12,7 +12,7 @@ import (
 func main() {
 	m, err := migrate.New(
 		"file://"+"migrations",
-		"postgres://postgres:ted@localhost:5433/exchange?sslmode=disable")
+		"postgres://postgres:postgres@localhost:5432/exchange?sslmode=disable")
 	if err != nil {
 		slog.Error("migration connect failure", "err", err)
 		panic(err)

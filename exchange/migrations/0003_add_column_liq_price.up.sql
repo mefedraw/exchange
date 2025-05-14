@@ -1,0 +1,2 @@
+ALTER TABLE orders
+    ADD COLUMN liquidation_price DECIMAL(18,2) NOT NULL DEFAULT 0;

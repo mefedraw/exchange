@@ -158,15 +158,15 @@ func (s *Storage) CreateOrder(ctx context.Context,
 	leverage uint8,
 	entryPrice decimal.Decimal,
 	status models.OrderStatus,
-	createdAt time.Time) (uuid.UUID, error) {
+	createdAt time.Time, liquidationPrice decimal.Decimal, ticker string) (uuid.UUID, error) {
 
 	const op = "postgresql.CreateOrder"
 	log := slog.With("op", op)
 
-	const queryCreateOrder = "INSERT INTO orders(id, user_id, pair_id, type, margin, leverage, entry_price, status, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id"
+	const queryCreateOrder = "INSERT INTO orders(id, user_id, pair_id, type, margin, leverage, entry_price, status, created_at, liquidation_price, ticker) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9, $10, $11) RETURNING id"
 
 	var orderId uuid.UUID
-	err := s.db.QueryRow(ctx, queryCreateOrder, id, userId, pairId, orderType, margin, leverage, entryPrice, status, createdAt).Scan(&orderId)
+	err := s.db.QueryRow(ctx, queryCreateOrder, id, userId, pairId, orderType, margin, leverage, entryPrice, status, createdAt, liquidationPrice, ticker).Scan(&orderId)
 	if err != nil {
 		log.Error("Failed to create order", "id", id, "user_id", userId, "pair_id", pairId, "err", err)
 		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
@@ -181,7 +181,10 @@ func (s *Storage) GetOrder(ctx context.Context, id uuid.UUID) (models.Order, err
 	log := slog.With("op", op)
 	const queryGetOrder = `SELECT * FROM orders WHERE id = $1`
 	var order models.Order
-	err := s.db.QueryRow(ctx, queryGetOrder, id).Scan(&order.Id, &order.UserId, &order.PairId, &order.Type, &order.Margin, &order.Leverage, &order.EntryPrice, &order.ClosePrice, &order.Status, &order.CreatedAt)
+	err := s.db.QueryRow(ctx, queryGetOrder, id).Scan(
+		&order.Id, &order.UserId, &order.PairId, &order.Type,
+		&order.Margin, &order.Leverage, &order.EntryPrice,
+		&order.ClosePrice, &order.Status, &order.CreatedAt, &order.LiquidationPrice, &order.Ticker)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return order, fmt.Errorf("%s: %w", op, ErrOrderNotExists)
@@ -211,7 +214,7 @@ func (s *Storage) GetUserOrders(ctx context.Context, userId int64) ([]models.Ord
 			&order.PairId, &order.Type,
 			&order.Margin, &order.Leverage,
 			&order.EntryPrice, &order.ClosePrice,
-			&order.Status, &order.CreatedAt)
+			&order.Status, &order.CreatedAt, &order.LiquidationPrice, &order.Ticker)
 		if err != nil {
 			log.Error("Failed to scan user order", "user_id", userId, "err", err)
 			return orders, fmt.Errorf("%s: %w", op, err)
@@ -234,6 +237,8 @@ func (s *Storage) OpenOrder(
 	entryPrice decimal.Decimal,
 	status models.OrderStatus,
 	createdAt time.Time,
+	liquidationPrice decimal.Decimal,
+	ticker string,
 ) (orderID uuid.UUID, err error) {
 	const op = "postgresql.OpenOrder"
 	log := slog.With("op", op)
@@ -253,13 +258,13 @@ func (s *Storage) OpenOrder(
 	// 1. Создаем ордер
 	const queryCreateOrder = `
         INSERT INTO orders(id, user_id, pair_id, type, margin, leverage, 
-                          entry_price, status, created_at)
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                          entry_price, status, created_at, liquidation_price, ticker)
+        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         RETURNING id`
 
 	err = tx.QueryRow(ctx, queryCreateOrder,
 		id, userId, pairId, orderType, margin,
-		leverage, entryPrice, status, createdAt,
+		leverage, entryPrice, status, createdAt, liquidationPrice, ticker,
 	).Scan(&orderID)
 	if err != nil {
 		log.Error("Failed to open order", "err", err)
@@ -297,6 +302,21 @@ func (s *Storage) OpenOrder(
 		"user_id", userId,
 		"new_balance", newBalance)
 	return orderID, nil
+}
+
+func (s *Storage) LiquidateOrder(ctx context.Context, orderID uuid.UUID, closePrice decimal.Decimal) (uuid.UUID, error) {
+	const op = "postgres.LiquidateOrder"
+	log := slog.With("op", op)
+	const queryLiquidateOrder = "UPDATE orders SET close_price=$1, status='liquidated' WHERE id=$2 AND status = 'open' RETURNING id"
+	var liqOrderId uuid.UUID
+	err := s.db.QueryRow(ctx, queryLiquidateOrder, closePrice, orderID).Scan(&liqOrderId)
+	if err != nil {
+		log.Error("Failed to liquidate order", "order_id", orderID, "err", err)
+		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	log.Info("Successfully liquidated order", "order_id", orderID)
+	return liqOrderId, nil
 }
 
 // CloseOrder sets order status to 'closed' and change order owner funds
@@ -422,4 +442,40 @@ func (s *Storage) GetTradingPairId(baseAsset, quoteAsset string) (int64, error) 
 	}
 
 	return id, nil
+}
+
+func (s *Storage) GetLiqOrders(ctx context.Context, markPrice decimal.Decimal, pairId int64) ([]uuid.UUID, error) {
+	const op = "postgresql.GetLiqOrders"
+	log := slog.With("op", op)
+
+	const queryGetLiqOrders = "SELECT id FROM orders WHERE orders.pair_id = :pairId AND ((orders.type = 'long' AND liquidation_price >= :markPrice) AND (orders.type = 'short' AND liquidation_price <= :markPrice))"
+
+	var orderIds []uuid.UUID
+	rows, err := s.db.Query(context.Background(), queryGetLiqOrders, markPrice, pairId)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			log.Debug("Orders for liq not found")
+		} else {
+			log.Error("Failed to get liq orders", "op", op, "err", err)
+			return orderIds, fmt.Errorf("%s: get liq orders: %w", op, err)
+		}
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var order models.Order
+		err := rows.Scan(&order.Id, &order.UserId,
+			&order.PairId, &order.Type,
+			&order.Margin, &order.Leverage,
+			&order.EntryPrice, &order.ClosePrice,
+			&order.Status, &order.CreatedAt, &order.LiquidationPrice, &order.Ticker)
+		if err != nil {
+			log.Error("Failed to scan orders", "err", err)
+			return nil, fmt.Errorf("%s: %w", op, err)
+		}
+		orderIds = append(orderIds, order.Id)
+	}
+
+	log.Info("Successfully get orders for liq", "orders", orderIds)
+	return orderIds, nil
 }

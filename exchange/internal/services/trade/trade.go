@@ -74,9 +74,26 @@ func (t *Trade) OpenTradeDeal(ctx context.Context,
 		return uuid.Nil, fmt.Errorf("failed to convert entryPrice. %s: %w", op, err)
 	}
 
-	id, err := t.orderService.OpenOrder(ctx, userId, ticker, orderType, margin, leverage, entryPriceDec)
+	// todo: liquidation price
+	lev := decimal.NewFromInt(int64(leverage))
+	var liqPrice decimal.Decimal
+	if orderType == models.Long {
+		// long: entryPrice * (leverage-1)/leverage
+		liqPrice = entryPriceDec.Mul(lev.Sub(decimal.NewFromInt(1))).Div(lev)
+	} else {
+		// short: entryPrice * (leverage+1)/leverage
+		liqPrice = entryPriceDec.Mul(lev.Add(decimal.NewFromInt(1))).Div(lev)
+	}
+
+	id, err := t.orderService.OpenOrder(ctx, userId, ticker, orderType, margin, leverage, entryPriceDec, liqPrice)
 	if err != nil {
 		t.log.Error("Error opening order", "error", err, "userId", userId)
+		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	err = t.redis.SaveOrder(ctx, models.Order{Ticker: ticker, Type: orderType, Id: id})
+	if err != nil {
+		t.log.Error("Error saving order to redis", "error", err, "orderId", id)
 		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
 	}
 
@@ -120,7 +137,19 @@ func (t *Trade) CloseTradeDeal(ctx context.Context, orderId uuid.UUID, ticker st
 		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
 	}
 
+	t.redis.RemoveOrder(ctx, id.String())
+
 	return id, nil
+}
+
+func (t *Trade) LiquidateTradeDeal(ctx context.Context, orderId uuid.UUID, closePrice decimal.Decimal) (uuid.UUID, error) {
+	const op = "trade.LiquidateTradeDeal"
+	orderId, err := t.orderService.LiquidateOrder(ctx, orderId, closePrice)
+	if err != nil {
+		t.log.Error("Error getting order", "error", err, "orderId", orderId)
+		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
+	}
+	return orderId, nil
 }
 
 func calculateOrderProfit(order models.Order, closePriceDec decimal.Decimal) decimal.Decimal {

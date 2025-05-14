@@ -35,7 +35,7 @@ type Manager interface {
 		leverage uint8,
 		entryPrice decimal.Decimal,
 		status models.OrderStatus,
-		createdAt time.Time) (uuid.UUID, error)
+		createdAt time.Time, liquidationPrice decimal.Decimal, ticker string) (uuid.UUID, error)
 	GetOrder(ctx context.Context, id uuid.UUID) (models.Order, error)
 	GetUserOrders(ctx context.Context, userId int64) ([]models.Order, error)
 	OpenOrder(
@@ -48,7 +48,8 @@ type Manager interface {
 		leverage uint8,
 		entryPrice decimal.Decimal,
 		status models.OrderStatus,
-		createdAt time.Time,
+		createdAt time.Time, liquidationPrice decimal.Decimal,
+		ticekr string,
 	) (orderID uuid.UUID, err error)
 	CloseOrder(
 		ctx context.Context,
@@ -56,6 +57,8 @@ type Manager interface {
 		closePrice decimal.Decimal,
 		balanceIncrease decimal.Decimal,
 	) (orderId uuid.UUID, err error)
+	GetLiqOrders(ctx context.Context, markPrice decimal.Decimal, pairId int64) ([]uuid.UUID, error)
+	LiquidateOrder(ctx context.Context, orderID uuid.UUID, closePrice decimal.Decimal) (uuid.UUID, error)
 }
 
 type TradingPairManager interface {
@@ -78,7 +81,7 @@ func (o *Order) CreateOrder(ctx context.Context,
 	orderType models.OrderType,
 	margin decimal.Decimal,
 	leverage uint8,
-	entryPrice decimal.Decimal) (uuid.UUID, error) {
+	entryPrice decimal.Decimal, liquidationPrice decimal.Decimal) (uuid.UUID, error) {
 	const op = "order.CreateOrder"
 
 	baseAsset, quoteAsset, err := checkTicker(ticker)
@@ -103,7 +106,7 @@ func (o *Order) CreateOrder(ctx context.Context,
 	orderStatus := models.Open
 	createdAt := time.Now()
 
-	orderId, err = o.Manager.CreateOrder(ctx, orderId, userId, pairId, orderType, margin, leverage, entryPrice, orderStatus, createdAt)
+	orderId, err = o.Manager.CreateOrder(ctx, orderId, userId, pairId, orderType, margin, leverage, entryPrice, orderStatus, createdAt, liquidationPrice, ticker)
 	if err != nil {
 		o.log.Error("failed to create order", "error", err)
 		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
@@ -118,7 +121,7 @@ func (o *Order) OpenOrder(ctx context.Context,
 	orderType models.OrderType,
 	margin decimal.Decimal,
 	leverage uint8,
-	entryPrice decimal.Decimal) (uuid.UUID, error) {
+	entryPrice decimal.Decimal, liquidationPrice decimal.Decimal) (uuid.UUID, error) {
 	const op = "order.CreateOrder"
 
 	baseAsset, quoteAsset, err := checkTicker(ticker)
@@ -149,7 +152,7 @@ func (o *Order) OpenOrder(ctx context.Context,
 	orderStatus := models.Open
 	createdAt := time.Now()
 
-	orderId, err = o.Manager.OpenOrder(ctx, orderId, userId, pairId, orderType, margin, leverage, entryPrice, orderStatus, createdAt)
+	orderId, err = o.Manager.OpenOrder(ctx, orderId, userId, pairId, orderType, margin, leverage, entryPrice, orderStatus, createdAt, liquidationPrice, ticker)
 	if err != nil {
 		o.log.Error("failed to create order", "error", err)
 		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
@@ -193,6 +196,35 @@ func (o *Order) GetOrder(ctx context.Context, orderID uuid.UUID) (models.Order, 
 		return models.Order{}, fmt.Errorf("%s: %w", op, err)
 	}
 	return order, nil
+}
+
+func (o *Order) LiquidateOrder(ctx context.Context, orderID uuid.UUID, closePrice decimal.Decimal) (uuid.UUID, error) {
+	const op = "order.LiquidateOrder"
+	orderId, err := o.Manager.LiquidateOrder(ctx, orderID, closePrice)
+	if err != nil {
+		o.log.Error("failed to liquidate order", "order", orderID, "error", err)
+		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
+	}
+	return orderId, nil
+}
+
+func (o *Order) GetLiqOrders(ctx context.Context, markPrice decimal.Decimal, ticker string) ([]uuid.UUID, error) {
+	const op = "order.GetLiqOrders"
+
+	baseAsset, quoteAsset, err := checkTicker(ticker)
+	if err != nil {
+		o.log.Error("Invalid ticker", "ticker", ticker, "err", err)
+	}
+
+	pairId, err := o.tp.GetTradingPairId(baseAsset, quoteAsset)
+
+	orders, err := o.Manager.GetLiqOrders(ctx, markPrice, pairId)
+	if err != nil {
+		o.log.Error("failed to get liq orders", "error", err)
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return orders, nil
 }
 
 func checkTicker(ticker string) (string, string, error) {
