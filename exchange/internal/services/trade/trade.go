@@ -1,4 +1,4 @@
-﻿package trade
+package trade
 
 import (
 	"Exchange/internal/domain/models"
@@ -137,7 +137,7 @@ func (t *Trade) CloseTradeDeal(ctx context.Context, orderId uuid.UUID, ticker st
 		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	t.redis.RemoveOrder(ctx, id.String())
+	t.redis.RemoveOrder(ctx, id.String(), ticker, order.Type)
 
 	return id, nil
 }

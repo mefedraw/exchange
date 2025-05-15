@@ -14,7 +14,10 @@ import (
 	"time"
 )
 
-const prefix = "exchange:binance:price"
+const (
+	prefix      = "exchange:binance:price"
+	orderPrefix = "orders:"
+)
 
 type Redis struct {
 	client *redis.Client
@@ -32,7 +35,7 @@ func New(redisConfig config.RedisConfig) *Redis {
 	}
 }
 
-func (s *Redis) SaveOrder(ctx context.Context, order models.Order) error {
+func (s *Redis) SaveOrder(ctx context.Context, order models.Order) error { // orders:long:BTC/USDT
 	const method = "SaveOrder"
 	log := slog.With("method", method)
 	parsedLiqPrice, err := strconv.ParseFloat(order.LiquidationPrice.String(), 64)
@@ -41,25 +44,26 @@ func (s *Redis) SaveOrder(ctx context.Context, order models.Order) error {
 		return fmt.Errorf("liq price parse err: %s:%w", "err", err)
 	}
 
-	orderPrefix := "orders:"
+	curPrefix := orderPrefix
 	if models.Long == order.Type {
-		orderPrefix += "long:"
+		curPrefix += "long:"
 	} else if models.Short == order.Type {
-		orderPrefix += "short:"
+		curPrefix += "short:"
 	}
-	orderPrefix += order.Ticker
+	curPrefix += order.Ticker
 
-	s.client.ZAdd(ctx, orderPrefix, &redis.Z{
+	s.client.ZAdd(ctx, curPrefix, &redis.Z{
 		Score: parsedLiqPrice, Member: order.Id.String(),
 	})
 	log.Info("saved order to redis-sorted-set", "id", order.Id)
 	return nil
 }
 
-func (s *Redis) RemoveOrder(ctx context.Context, id string) error {
+func (s *Redis) RemoveOrder(ctx context.Context, id, ticker string, orderType models.OrderType) error {
 	const method = "RemoveOrder"
+	curPrefix := fmt.Sprintf("%s%s:%s", orderPrefix, string(orderType), ticker)
 	log := slog.With("method", method)
-	s.client.ZRem(ctx, prefix+id, &redis.Z{
+	s.client.ZRem(ctx, curPrefix, &redis.Z{
 		Member: id,
 	})
 	log.Info("removed order from redis-sorted-set", "id", id)
