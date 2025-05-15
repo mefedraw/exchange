@@ -68,16 +68,6 @@ type GetOrdersRequest struct {
 
 type GetOrdersResponse struct {
 	Orders []models.Order `json:"orders"`
-	//Id         uuid.UUID          `json:"id" validate:"required"`
-	//UserId     int64              `json:"user_id" validate:"required"`
-	//PairId     int64              `json:"pair_id" validate:"required"`
-	//OrderType  models.OrderType   `json:"order_type" validate:"required"`
-	//Margin     decimal.Decimal    `json:"margin" validate:"required"`
-	//Leverage   uint8              `json:"leverage" validate:"required"`
-	//EntryPrice decimal.Decimal    `json:"entry_price" validate:"required"`
-	//ClosePrice *decimal.Decimal   `json:"close_price" validate:"required"`
-	//Status     models.OrderStatus `json:"status" validate:"required"`
-	//CreatedAt  time.Time          `json:"created_at" validate:"required"`
 }
 
 type LoginRequest struct {

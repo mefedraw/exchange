@@ -43,14 +43,14 @@ func (s *Redis) SaveOrder(ctx context.Context, order models.Order) error {
 
 	orderPrefix := "orders:"
 	if models.Long == order.Type {
-		orderPrefix += "long"
+		orderPrefix += "long:"
 	} else if models.Short == order.Type {
-		orderPrefix += "short"
+		orderPrefix += "short:"
 	}
 	orderPrefix += order.Ticker
 
 	s.client.ZAdd(ctx, orderPrefix, &redis.Z{
-		Score: parsedLiqPrice, Member: order.Id,
+		Score: parsedLiqPrice, Member: order.Id.String(),
 	})
 	log.Info("saved order to redis-sorted-set", "id", order.Id)
 	return nil
@@ -88,17 +88,18 @@ func (s *Redis) SavePrices(ctx context.Context, prices []models.PriceResponse) e
 func (s *Redis) GetLiqOrders(ctx context.Context, ticker, price string) ([]uuid.UUID, error) {
 	const method = "GetLiqOrders"
 	log := slog.With("method", method)
-	parsedLiqPrice, err := strconv.ParseFloat(price, 64)
-	if err != nil {
-		log.Error("failed to parse liq price", "err", err)
-		return nil, fmt.Errorf("%s:%w", method, err)
-	}
+	//parsedLiqPrice, err := strconv.ParseFloat(price, 64)
+	//if err != nil {
+	//	log.Error("failed to parse liq price", "err", err)
+	//	return nil, fmt.Errorf("%s:%w", method, err)
+	//}
 
 	const longPrefix = "orders:long:"
 	const shortPrefix = "orders:short:"
 	const minInf = "-inf"
 	const maxInf = "+inf"
-	maxScore := strconv.FormatFloat(parsedLiqPrice, 'f', -1, 64)
+	//maxScore := strconv.FormatFloat(parsedLiqPrice, 'f', -1, 64)
+	maxScore := price
 	longOrders, err := s.client.ZRangeByScore(ctx, longPrefix+ticker, &redis.ZRangeBy{
 		Min: minInf, Max: maxScore,
 	}).Result()

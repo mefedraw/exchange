@@ -91,7 +91,7 @@ func (t *Trade) OpenTradeDeal(ctx context.Context,
 		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	err = t.redis.SaveOrder(ctx, models.Order{Ticker: ticker, Type: orderType, Id: id})
+	err = t.redis.SaveOrder(ctx, models.Order{Ticker: ticker, Type: orderType, Id: id, LiquidationPrice: liqPrice})
 	if err != nil {
 		t.log.Error("Error saving order to redis", "error", err, "orderId", id)
 		return uuid.Nil, fmt.Errorf("%s: %w", op, err)

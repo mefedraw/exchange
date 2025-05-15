@@ -4,7 +4,6 @@ import (
 	"Exchange/internal/config"
 	"Exchange/internal/domain/models"
 	"Exchange/internal/http_client"
-	"Exchange/internal/liquidation"
 	"Exchange/internal/services/order"
 	"Exchange/internal/services/trade"
 	user "Exchange/internal/services/user"
@@ -127,9 +126,9 @@ func main() {
 	orderService := order.New(*log, storage, storage, storage)
 	tradeService := trade.New(log, *orderService, *redisClient)
 
-	// TODO: init Liquidator
-	liquidator, err := liquidation.NewLiquidator(nc, orderService)
-	liquidator.Process()
+	//// TODO: init Liquidator
+	//liquidator, err := liquidation.NewLiquidator(nc, orderService)
+	//liquidator.Process()
 
 	userHandler := handler.NewUserHandler(log, userService, validate)
 	tradeHandler := handler.NewTradeHandler(log, tradeService, validate)

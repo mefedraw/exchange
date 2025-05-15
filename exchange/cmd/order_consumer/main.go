@@ -6,7 +6,10 @@ import (
 	"context"
 	"github.com/nats-io/nats.go"
 	"log/slog"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 )
 
 func main() {
@@ -22,10 +25,10 @@ func main() {
 	}
 	redis := redis.New(cfg.RedisCfg)
 
-	const liqOrdersTopic = "liq-orders."
+	const liqOrdersTopic = "orders"
 	_, err = js.AddStream(&nats.StreamConfig{
 		Name:     "LIQ-ORDERS-STREAM",
-		Subjects: []string{"liq-orders."},
+		Subjects: []string{liqOrdersTopic},
 	})
 	if err != nil {
 		slog.Error("order consumer AddStream err:", err)
@@ -49,4 +52,7 @@ func main() {
 		}
 	}, nats.Durable("ORDER_PROCESSOR"))
 
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigChan
 }
