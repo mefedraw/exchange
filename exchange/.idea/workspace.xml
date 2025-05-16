@@ -4,12 +4,8 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1bfe1390-3572-4cbf-8137-df1b2f9e8479" name="Changes" comment="">
+    <list default="true" id="1bfe1390-3572-4cbf-8137-df1b2f9e8479" name="Changes" comment="order remove from redis-sorted-set fixed prefix problem">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/app/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/order_consumer/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/order_consumer/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/domain/models/transport/model.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/domain/models/transport/model.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/services/trade/trade.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/services/trade/trade.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/storage/redis/redis.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/storage/redis/redis.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -53,46 +49,54 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultGoTemplateProperty": "Go File",
-    "Docker.docker-compose.yml.nats: Compose Deployment.executor": "Run",
-    "Docker.docker-compose.yml.redis: Compose Deployment.executor": "Run",
-    "Docker.docker-compose.yml: Compose Deployment.executor": "Run",
-    "Go Build.go build Exchange/cmd/app.executor": "Run",
-    "Go Build.go build Exchange/cmd/migrator.executor": "Run",
-    "Go Build.go build Exchange/cmd/order_consumer.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
-    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
-    "git-widget-placeholder": "main",
-    "go.import.settings.migrated": "true",
-    "go.sdk.automatically.set": "true",
-    "last_opened_file_path": "C:/Users/fyodo.DESKTOP-9A67S1J",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "advanced.settings"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
+    &quot;Docker.docker-compose.yml.nats: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yml.redis: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Go Build.go build Exchange/cmd/app.executor&quot;: &quot;Run&quot;,
+    &quot;Go Build.go build Exchange/cmd/migrator.executor&quot;: &quot;Run&quot;,
+    &quot;Go Build.go build Exchange/cmd/order_consumer.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/fyodo.DESKTOP-9A67S1J&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;advanced.settings&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "redis",
-      "postgresql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;redis&quot;,
+      &quot;postgresql&quot;
     ],
-    "com.intellij.ide.scratch.LRUPopupBuilder$1/SQL Dialect": [
-      "PostgreSQL"
+    &quot;com.intellij.ide.scratch.LRUPopupBuilder$1/SQL Dialect&quot;: [
+      &quot;PostgreSQL&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\fyodo.DESKTOP-9A67S1J\GolandProjects\exchange\cmd\app" />
       <recent name="C:\Users\fyodo.DESKTOP-9A67S1J\GolandProjects\exchange" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build Exchange/cmd/order_consumer">
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="GoApplicationRunConfiguration" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager" selected="Go Build.go build Exchange/cmd/app">
     <configuration name="go build Exchange/cmd/app" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="exchange" />
       <working_directory value="$PROJECT_DIR$" />
@@ -139,7 +143,9 @@
       <method v="2" />
     </configuration>
     <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
-      <deployment type="docker-compose.yml" />
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
       <method v="2" />
     </configuration>
     <configuration name="docker-compose.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
@@ -180,14 +186,15 @@
       <item itemvalue="Docker.docker-compose.yml.nats: Compose Deployment" />
       <item itemvalue="Docker.docker-compose.yml.redis: Compose Deployment" />
       <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
+      <item itemvalue="Go Build.go build Exchange/cmd/migrator" />
       <item itemvalue="Go Build.go build Exchange/cmd/order_consumer" />
       <item itemvalue="Go Build.go build Exchange/cmd/app" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build Exchange/cmd/order_consumer" />
         <item itemvalue="Go Build.go build Exchange/cmd/app" />
         <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
+        <item itemvalue="Go Build.go build Exchange/cmd/order_consumer" />
         <item itemvalue="Docker.docker-compose.yml.redis: Compose Deployment" />
         <item itemvalue="Docker.docker-compose.yml.nats: Compose Deployment" />
       </list>
@@ -204,6 +211,10 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="order remove from redis-sorted-set fixed prefix problem" />
+    <option name="LAST_COMMIT_MESSAGE" value="order remove from redis-sorted-set fixed prefix problem" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
