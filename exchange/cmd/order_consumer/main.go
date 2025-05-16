@@ -13,46 +13,64 @@ import (
 )
 
 func main() {
-	ctx := context.Context(context.Background())
+	// Инициализация логгера
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	}))
+	slog.SetDefault(logger)
+
+	ctx := context.Background()
 	cfg := config.MustLoad()
-	nc, err := nats.Connect("nats://localhost:4222")
-	if err != nil {
-		slog.Error("order consumer nats.Connect err:", err)
-	}
-	js, err := nc.JetStream()
-	if err != nil {
-		slog.Error("order consumer jetstream creating err:", err)
-	}
+
 	redis := redis.New(cfg.RedisCfg)
 
-	const liqOrdersTopic = "orders"
-	_, err = js.AddStream(&nats.StreamConfig{
-		Name:     "LIQ-ORDERS-STREAM",
-		Subjects: []string{liqOrdersTopic},
-	})
+	nc, err := nats.Connect("nats://localhost:4222")
 	if err != nil {
-		slog.Error("order consumer AddStream err:", err)
+		logger.Error("NATS connection failed", "error", err)
+		os.Exit(1)
+	}
+	defer nc.Close()
+
+	js, err := nc.JetStream()
+	if err != nil {
+		logger.Error("JetStream init failed", "error", err)
+		os.Exit(1)
 	}
 
-	const prefix = "prices."
-	js.Subscribe("prices.*", func(msg *nats.Msg) {
-		if strings.HasPrefix(msg.Subject, prefix) {
-			symbol := msg.Subject[len(prefix):]
-			liqOrders, err := redis.GetLiqOrders(ctx, symbol, string(msg.Data))
-			if err != nil {
-				slog.Error("order consumer GetLiqOrders err:", err)
-			}
-			for _, liqOrderId := range liqOrders {
-				_, err = js.Publish(liqOrdersTopic, []byte(liqOrderId.String()))
-				if err != nil {
-					slog.Error("liq-order Publish err:", err)
-				}
-				slog.Info("order for liquidation: ", liqOrderId)
-			}
-		}
-	}, nats.Durable("ORDER_PROCESSOR"))
+	const pricesSubj = "prices."
+	// Подписка с правильными опциями
+	sub, err := js.Subscribe(pricesSubj+"*", func(msg *nats.Msg) {
+		// logger.Info("Received message", "subject", msg.Subject, "body", string(msg.Data))
 
+		// todo: msg handling
+		const quoteAsset = "USDT"
+		key := strings.TrimSuffix(msg.Subject, quoteAsset)
+		key = strings.TrimPrefix(key, pricesSubj)
+		key = key + "/" + quoteAsset
+		liqOrders, err := redis.GetLiqOrders(ctx, key, string(msg.Data))
+		if err != nil {
+			logger.Error("Get liq orders failed", "error", err)
+		}
+		for _, liqOrder := range liqOrders {
+			logger.Info("order for liquidation", "order_id", liqOrder.String())
+		}
+		msg.Ack() // Подтверждаем обработку
+	},
+		nats.Durable("ORDER_PROCESSOR"),
+		nats.DeliverAll(),
+		nats.AckExplicit(),
+	)
+	if err != nil {
+		logger.Error("Subscribe failed", "error", err)
+		os.Exit(1)
+	}
+	defer sub.Unsubscribe()
+
+	logger.Info("Service started successfully")
+
+	// Ожидание сигнала завершения
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	<-sigChan
+	logger.Info("Shutting down...")
 }

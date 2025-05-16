@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="1bfe1390-3572-4cbf-8137-df1b2f9e8479" name="Changes" comment="order remove from redis-sorted-set fixed prefix problem">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/order_consumer/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/order_consumer/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/storage/redis/redis.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/storage/redis/redis.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -96,7 +97,7 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="Go Build.go build Exchange/cmd/app">
+  <component name="RunManager" selected="Go Build.go build Exchange/cmd/order_consumer">
     <configuration name="go build Exchange/cmd/app" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="exchange" />
       <working_directory value="$PROJECT_DIR$" />
@@ -192,9 +193,9 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Build.go build Exchange/cmd/order_consumer" />
         <item itemvalue="Go Build.go build Exchange/cmd/app" />
         <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
-        <item itemvalue="Go Build.go build Exchange/cmd/order_consumer" />
         <item itemvalue="Docker.docker-compose.yml.redis: Compose Deployment" />
         <item itemvalue="Docker.docker-compose.yml.nats: Compose Deployment" />
       </list>
