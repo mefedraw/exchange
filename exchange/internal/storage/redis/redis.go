@@ -63,6 +63,7 @@ func (s *Redis) RemoveOrder(ctx context.Context, id, ticker string, orderType mo
 	const method = "RemoveOrder"
 	curPrefix := fmt.Sprintf("%s%s:%s", orderPrefix, string(orderType), ticker)
 	log := slog.With("method", method)
+	log.Info("removing order from redis-sorted-set", "id", id, "prefix", curPrefix)
 	err := s.client.ZRem(ctx, curPrefix, id).Err()
 	if err != nil {
 		log.Error("failed to remove order from redis-sorted-set", "err", err, "id", id)

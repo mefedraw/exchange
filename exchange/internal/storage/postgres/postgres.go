@@ -307,7 +307,7 @@ func (s *Storage) OpenOrder(
 func (s *Storage) LiquidateOrder(ctx context.Context, orderID uuid.UUID, closePrice decimal.Decimal) (uuid.UUID, error) {
 	const op = "postgres.LiquidateOrder"
 	log := slog.With("op", op)
-	const queryLiquidateOrder = "UPDATE orders SET close_price=$1, status='liquidated' WHERE id=$2 AND status = 'open' RETURNING id"
+	const queryLiquidateOrder = "UPDATE orders SET close_price=$1, status='liquidated' WHERE id=$2 RETURNING id"
 	var liqOrderId uuid.UUID
 	err := s.db.QueryRow(ctx, queryLiquidateOrder, closePrice, orderID).Scan(&liqOrderId)
 	if err != nil {

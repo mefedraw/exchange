@@ -2,9 +2,14 @@
 
 import (
 	"Exchange/internal/config"
+	"Exchange/internal/services/order"
+	"Exchange/internal/services/trade"
+	"Exchange/internal/storage/postgres"
 	"Exchange/internal/storage/redis"
 	"context"
+	"fmt"
 	"github.com/nats-io/nats.go"
+	"github.com/shopspring/decimal"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -22,7 +27,35 @@ func main() {
 	ctx := context.Background()
 	cfg := config.MustLoad()
 
+	//todo: REDIS
 	redis := redis.New(cfg.RedisCfg)
+
+	//todo: POSTGRES
+	var connString string
+	if cfg.Env == "dev_mac" {
+		slog.Info("connecting to postgres via dev_mac")
+		connString = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+			cfg.PostgresCfgMac.Username,
+			cfg.PostgresCfgMac.Password,
+			cfg.PostgresCfgMac.Host,
+			cfg.PostgresCfgMac.Port,
+			cfg.PostgresCfgMac.Database)
+	} else if cfg.Env == "dev_win" {
+		slog.Info("connecting to postgres via dev_win")
+		connString = fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
+			cfg.PostgresCfgWin.Username,
+			cfg.PostgresCfgWin.Password,
+			cfg.PostgresCfgWin.Host,
+			cfg.PostgresCfgWin.Port,
+			cfg.PostgresCfgWin.Database)
+	}
+
+	storage, err := postgres.New(connString)
+	if err != nil {
+		slog.Error("failed to connect to postgres")
+	}
+	orderService := order.New(*logger, storage, storage, storage)
+	tradeService := trade.New(logger, *orderService, *redis)
 
 	nc, err := nats.Connect("nats://localhost:4222")
 	if err != nil {
@@ -47,12 +80,20 @@ func main() {
 		key := strings.TrimSuffix(msg.Subject, quoteAsset)
 		key = strings.TrimPrefix(key, pricesSubj)
 		key = key + "/" + quoteAsset
-		liqOrders, err := redis.GetLiqOrders(ctx, key, string(msg.Data))
+		currentPrice := string(msg.Data)
+		liqOrders, err := redis.GetLiqOrders(ctx, key, currentPrice)
 		if err != nil {
 			logger.Error("Get liq orders failed", "error", err)
 		}
-		for _, liqOrder := range liqOrders {
-			logger.Info("order for liquidation", "order_id", liqOrder.String())
+		for _, liqOrderId := range liqOrders {
+			logger.Info("order for liquidation", "order_id", liqOrderId.String())
+			curPriceDecimal, _ := decimal.NewFromString(currentPrice)
+			id, err := tradeService.LiquidateTradeDeal(ctx, liqOrderId, curPriceDecimal)
+			if err != nil {
+				logger.Error("liquidation was failed", "id", id, "error", err)
+			} else {
+				logger.Info("order was successfully liquidated", "order_id", id.String())
+			}
 		}
 		msg.Ack() // Подтверждаем обработку
 	},

@@ -149,6 +149,11 @@ func (t *Trade) LiquidateTradeDeal(ctx context.Context, orderId uuid.UUID, close
 		t.log.Error("Error getting order", "error", err, "orderId", orderId)
 		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
 	}
+	curOrder, err := t.orderService.GetOrder(ctx, orderId)
+	if err != nil {
+		t.log.Error("Error getting order", "error", err, "orderId", orderId)
+	}
+	t.redis.RemoveOrder(ctx, orderId.String(), strings.TrimSpace(curOrder.Ticker), curOrder.Type)
 	return orderId, nil
 }
 

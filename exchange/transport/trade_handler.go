@@ -81,6 +81,7 @@ func (h *TradeHandler) PostOpenTrade(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	slog.Debug(req.Ticker)
 	orderID, err := h.tradeService.OpenTradeDeal(r.Context(), req.UserID, req.Ticker, req.OrderType, req.Margin, req.Leverage)
 	if err != nil {
 		h.log.Error("Failed to open trade", "error", err, "userId", req.UserID)
